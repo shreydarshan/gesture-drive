@@ -115,7 +115,7 @@ export class VehicleController {
 
     this.state = {
       command: activeCommand,
-      speed: Math.round(speed),
+      speed: Math.round(speed * 10) / 10,
       steering,
       steeringAngle,
       steeringDirection,

@@ -186,6 +186,11 @@ body {
   background: var(--accent-cyan);
 }
 
+.badge-dot.emergency-dot {
+  background: var(--accent-red);
+  box-shadow: 0 0 6px var(--accent-red);
+}
+
 /* Mirrored camera & overlay */
 .camera-video,
 .landmarks-overlay {

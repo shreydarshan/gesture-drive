@@ -22,7 +22,7 @@ const App: React.FC = () => {
             onStart={startCamera}
             onStop={stopCamera}
           />
-          <VehicleScene />
+          <VehicleScene vehicleState={stats.vehicleState} />
         </div>
 
         <div className="dashboard-row">
@@ -31,7 +31,7 @@ const App: React.FC = () => {
       </main>
 
       <footer className="app-footer">
-        <p>GestureDrive Phase 7.1 — 3D Rendering Foundation (Three.js / React Three Fiber)</p>
+        <p>GestureDrive Phase 7.2 — Real-time 3D Vehicle Control Integration (React Three Fiber)</p>
       </footer>
     </div>
   );
