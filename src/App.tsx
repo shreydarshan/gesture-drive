@@ -25,7 +25,7 @@ const App: React.FC = () => {
       </main>
 
       <footer className="app-footer">
-        <p>GestureDrive Phase 2 — MediaPipe Hand Landmarker Foundation</p>
+        <p>GestureDrive Phase 3 — Geometric Gesture Recognition Engine</p>
       </footer>
     </div>
   );

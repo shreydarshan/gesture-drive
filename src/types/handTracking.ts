@@ -1,3 +1,5 @@
+import type { HandGestureResult } from '../gesture/gestureTypes';
+
 export type CameraStatus =
   | 'idle'
   | 'initializing'
@@ -14,4 +16,5 @@ export interface HandTrackingStats {
   confidence: number | null;
   fps: number;
   isModelLoading: boolean;
+  gestures: HandGestureResult[];
 }

@@ -113,7 +113,7 @@ body {
 
 .workspace-grid {
   display: grid;
-  grid-template-columns: 1fr 340px;
+  grid-template-columns: 1fr 360px;
   gap: 24px;
 }
 
@@ -150,7 +150,7 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform: scaleX(-1); /* Mirrored front camera preview */
+  transform: scaleX(-1);
 }
 
 .camera-video.hidden,
@@ -380,20 +380,20 @@ body {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 12px;
-  padding: 14px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
 .metric-label {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-muted);
   font-weight: 500;
 }
 
 .metric-value {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--text-main);
   font-family: var(--font-mono, monospace);
@@ -405,6 +405,133 @@ body {
 
 .fps-value {
   color: var(--accent-green);
+}
+
+/* Gesture Recognition Engine Section */
+.gesture-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.gesture-engine-tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgba(168, 85, 247, 0.15);
+  color: var(--accent-purple);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.gesture-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.empty-gesture {
+  text-align: center;
+  align-items: center;
+  padding: 18px;
+}
+
+.gesture-hint {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+.gesture-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hand-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-cyan);
+}
+
+.confidence-pill {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--accent-green);
+}
+
+.gesture-main-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.gesture-label {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.gesture-value {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  font-family: var(--font-mono, monospace);
+}
+
+.gesture-active {
+  color: var(--accent-cyan);
+  text-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
+}
+
+.gesture-none {
+  color: var(--text-dim);
+}
+
+/* Visual Debugging Finger States */
+.debug-finger-states {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border-color);
+}
+
+.debug-title {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.finger-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.finger-badge {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-weight: 600;
+}
+
+.finger-badge.active {
+  background: rgba(6, 182, 212, 0.2);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+
+.finger-badge.folded {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-dim);
+  border: 1px solid transparent;
 }
 
 /* Footer */

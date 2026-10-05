@@ -8,6 +8,8 @@ export const Header: React.FC = () => {
           <svg
             className="logo-icon"
             viewBox="0 0 24 24"
+            width="24"
+            height="24"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
@@ -23,9 +25,9 @@ export const Header: React.FC = () => {
         <div>
           <div className="title-row">
             <h1 className="app-title">GestureDrive</h1>
-            <span className="phase-tag">Phase 2</span>
+            <span className="phase-tag">Phase 3</span>
           </div>
-          <p className="app-subtitle">Real-time Hand Tracking</p>
+          <p className="app-subtitle">Gesture Recognition Engine</p>
         </div>
       </div>
     </header>

@@ -3,6 +3,8 @@ import type { CameraStatus, HandTrackingStats } from '../types/handTracking';
 import { drawHandLandmarks } from '../lib/drawing';
 import { disposeHandLandmarker, getHandLandmarker } from '../lib/mediapipe';
 import type { HandLandmarker } from '@mediapipe/tasks-vision';
+import { recognizeMultipleHandGestures } from '../gesture/gestureRecognizer';
+import { GestureDebouncer } from '../gesture/gestureDebouncer';
 
 export function useHandTracking() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -16,11 +18,13 @@ export function useHandTracking() {
     confidence: null,
     fps: 0,
     isModelLoading: false,
+    gestures: [],
   });
 
   const streamRef = useRef<MediaStream | null>(null);
   const animFrameIdRef = useRef<number | null>(null);
   const landmarkerRef = useRef<HandLandmarker | null>(null);
+  const debouncerRef = useRef<GestureDebouncer>(new GestureDebouncer(5));
   const lastVideoTimeRef = useRef<number>(-1);
   const frameCountRef = useRef<number>(0);
   const lastFpsTimeRef = useRef<number>(0);
@@ -56,6 +60,7 @@ export function useHandTracking() {
       }
     }
 
+    debouncerRef.current.reset();
     lastVideoTimeRef.current = -1;
     updateStats({
       status: 'idle',
@@ -64,6 +69,7 @@ export function useHandTracking() {
       numHands: 0,
       confidence: null,
       fps: 0,
+      gestures: [],
     });
   }, [updateStats]);
 
@@ -109,11 +115,10 @@ export function useHandTracking() {
             updateStats({ fps: currentFps });
           }
 
-          // Process detection results
+          // Process detection & gestures
           const detectedHandsCount = results.landmarks ? results.landmarks.length : 0;
           const hasHands = detectedHandsCount > 0;
 
-          // Calculate confidence score if available from handedness
           let avgConfidence: number | null = null;
           if (results.handedness && results.handedness.length > 0) {
             const totalScore = results.handedness.reduce((acc, hand) => {
@@ -123,10 +128,18 @@ export function useHandTracking() {
             avgConfidence = Math.round((totalScore / results.handedness.length) * 100);
           }
 
+          // Recognize gestures for up to 2 detected hands
+          const rawGestures = recognizeMultipleHandGestures(
+            results.landmarks,
+            results.handedness
+          );
+          const stabilizedGestures = debouncerRef.current.process(rawGestures);
+
           updateStats({
             handDetected: hasHands,
             numHands: detectedHandsCount,
             confidence: avgConfidence,
+            gestures: stabilizedGestures,
           });
 
           // Draw landmarks on overlay canvas
@@ -154,7 +167,6 @@ export function useHandTracking() {
 
   // Start Camera function
   const startCamera = useCallback(async () => {
-    // Stop any existing stream before starting a new one
     stopCamera();
 
     updateStats({
@@ -163,7 +175,6 @@ export function useHandTracking() {
       isModelLoading: true,
     });
 
-    // Check if mediaDevices API is supported
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       updateStats({
         status: 'error',
@@ -174,12 +185,10 @@ export function useHandTracking() {
     }
 
     try {
-      // 1. Initialize MediaPipe HandLandmarker
       const landmarker = await getHandLandmarker();
       landmarkerRef.current = landmarker;
       updateStats({ isModelLoading: false });
 
-      // 2. Request camera stream
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           width: { ideal: 1280 },
@@ -206,7 +215,6 @@ export function useHandTracking() {
         errorMessage: null,
       });
 
-      // 3. Start detection frame loop
       frameCountRef.current = 0;
       lastFpsTimeRef.current = performance.now();
       animFrameIdRef.current = requestAnimationFrame(() => {
@@ -254,7 +262,6 @@ export function useHandTracking() {
     }
   }, [stopCamera, updateStats]);
 
-  // Clean up on component unmount
   useEffect(() => {
     isMountedRef.current = true;
 
