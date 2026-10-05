@@ -14,6 +14,8 @@ const INITIAL_VEHICLE_STATE = {
   steeringAngle: 0,
   steeringDirection: 'CENTER' as const,
   isEmergencyStopped: false,
+  safetyState: 'ACTIVE' as const,
+  safetyReason: 'NONE' as const,
 };
 
 export function useHandTracking() {
@@ -156,10 +158,12 @@ export function useHandTracking() {
           );
           const stabilizedGestures = debouncerRef.current.process(rawGestures);
 
-          // Vehicle control state engine (passing gestures + raw landmarks for directional steering)
+          // Vehicle control state engine + Safety layer
           const vehicleState = vehicleControllerRef.current.update(
             stabilizedGestures,
-            results.landmarks
+            results.landmarks,
+            avgConfidence,
+            startTimeMs
           );
 
           updateStats({

@@ -2,9 +2,11 @@ import type { NormalizedLandmark } from '@mediapipe/tasks-vision';
 import type { HandGestureResult } from '../gesture/gestureTypes';
 import type { VehicleCommand, VehicleState } from './vehicleTypes';
 import { SteeringController } from './steeringController';
+import { SafetyController } from './safetyController';
 
 export class VehicleController {
   private steeringController = new SteeringController();
+  private safetyController = new SafetyController(60, 500); // 60% confidence threshold, 500ms timeout
 
   private state: VehicleState = {
     command: 'IDLE',
@@ -13,62 +15,75 @@ export class VehicleController {
     steeringAngle: 0,
     steeringDirection: 'CENTER',
     isEmergencyStopped: false,
+    safetyState: 'ACTIVE',
+    safetyReason: 'NONE',
   };
 
   private maxSpeed = 120; // km/h
 
   public update(
     gestures: HandGestureResult[],
-    rawLandmarksList?: NormalizedLandmark[][]
+    rawLandmarksList?: NormalizedLandmark[][],
+    trackingConfidence: number | null = null,
+    timestamp: number = performance.now()
   ): VehicleState {
     const primaryLandmarks = rawLandmarksList?.[0];
-
-    if (!gestures || gestures.length === 0) {
-      return this.step('IDLE', primaryLandmarks);
-    }
+    const handDetected = Boolean(gestures && gestures.length > 0 && primaryLandmarks);
 
     const primaryHand = gestures[0];
     const rawGesture = primaryHand ? primaryHand.gesture : 'NONE';
 
-    let command: VehicleCommand = 'IDLE';
+    let requestedCommand: VehicleCommand = 'IDLE';
 
     switch (rawGesture) {
       case 'THUMB_UP':
-        command = 'ACCELERATE';
+        requestedCommand = 'ACCELERATE';
         break;
       case 'OPEN_PALM':
-        command = 'BRAKE';
+        requestedCommand = 'BRAKE';
         break;
       case 'FIST':
-        command = 'EMERGENCY_STOP';
+        requestedCommand = 'EMERGENCY_STOP';
         break;
       case 'PINCH':
-        command = 'SELECT';
+        requestedCommand = 'SELECT';
         break;
       case 'POINT':
       case 'NONE':
       default:
-        command = 'IDLE';
+        requestedCommand = 'IDLE';
         break;
     }
 
-    return this.step(command, primaryLandmarks);
-  }
+    // 1. Check for Emergency Stop trigger
+    if (requestedCommand === 'EMERGENCY_STOP') {
+      this.state.isEmergencyStopped = true;
+    }
 
-  private step(
-    command: VehicleCommand,
-    primaryLandmarks?: NormalizedLandmark[]
-  ): VehicleState {
-    let { speed, isEmergencyStopped } = this.state;
+    // 2. Safety Layer Evaluation
+    const safety = this.safetyController.evaluate(
+      handDetected,
+      trackingConfidence,
+      timestamp,
+      this.state.isEmergencyStopped
+    );
 
-    if (command === 'EMERGENCY_STOP') {
-      speed = 0;
-      isEmergencyStopped = true;
-    } else if (isEmergencyStopped) {
-      // While emergency stop is latched, speed must remain 0
+    // 3. Command determination
+    let activeCommand = requestedCommand;
+
+    if (this.state.isEmergencyStopped) {
+      activeCommand = 'EMERGENCY_STOP';
+    } else if (!safety.isSafeToDrive) {
+      activeCommand = 'IDLE'; // Fallback to safe coasting
+    }
+
+    // 4. Speed state transition
+    let { speed } = this.state;
+
+    if (activeCommand === 'EMERGENCY_STOP') {
       speed = 0;
     } else {
-      switch (command) {
+      switch (activeCommand) {
         case 'ACCELERATE':
           speed = Math.min(this.maxSpeed, speed + 1.5);
           break;
@@ -83,13 +98,13 @@ export class VehicleController {
       }
     }
 
-    // Steering calculation
+    // 5. Steering state transition
     let steering = 0.0;
     let steeringAngle = 0;
     let steeringDirection: VehicleState['steeringDirection'] = 'CENTER';
 
-    if (isEmergencyStopped) {
-      // Emergency forces steering safely to 0° / Center
+    if (!safety.isSafeToDrive || this.state.isEmergencyStopped) {
+      // Return steering safely to CENTER when tracking is invalid or emergency is engaged
       this.steeringController.reset();
     } else {
       const steeringResult = this.steeringController.update(primaryLandmarks);
@@ -98,27 +113,26 @@ export class VehicleController {
       steeringDirection = steeringResult.steeringDirection;
     }
 
-    const activeCommand =
-      isEmergencyStopped && command !== 'EMERGENCY_STOP' ? 'IDLE' : command;
-
     this.state = {
       command: activeCommand,
       speed: Math.round(speed),
       steering,
       steeringAngle,
       steeringDirection,
-      isEmergencyStopped,
+      isEmergencyStopped: this.state.isEmergencyStopped,
+      safetyState: safety.safetyState,
+      safetyReason: safety.safetyReason,
     };
 
     return this.state;
   }
 
   /**
-   * Explicitly resets the latched emergency stop state.
-   * Sets isEmergencyStopped to false, speed to 0, command to IDLE, and steering centered.
+   * Explicitly resets the latched emergency stop state and safety evaluation.
    */
   public resetEmergency(): void {
     this.steeringController.reset();
+    this.safetyController.reset();
     this.state = {
       command: 'IDLE',
       speed: 0,
@@ -126,6 +140,8 @@ export class VehicleController {
       steeringAngle: 0,
       steeringDirection: 'CENTER',
       isEmergencyStopped: false,
+      safetyState: 'ACTIVE',
+      safetyReason: 'NONE',
     };
   }
 

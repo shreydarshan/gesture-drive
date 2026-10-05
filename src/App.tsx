@@ -26,7 +26,7 @@ const App: React.FC = () => {
       </main>
 
       <footer className="app-footer">
-        <p>GestureDrive Phase 5 — Real-time Directional Steering Engine</p>
+        <p>GestureDrive Phase 6 — Safety & Reliability Fallback Layer</p>
       </footer>
     </div>
   );

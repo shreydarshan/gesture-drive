@@ -62,6 +62,33 @@ export const StatusPanel: React.FC<StatusPanelProps> = ({
 
   const steeringDisplay = getSteeringDisplay();
 
+  const getSafetyBadge = (state: string, reason: string) => {
+    if (state === 'EMERGENCY_STOP') {
+      return {
+        label: 'EMERGENCY STOP',
+        class: 'safety-emergency',
+        hint: 'Emergency latch active',
+      };
+    }
+    if (state === 'SAFE_FALLBACK') {
+      let reasonText = 'Hand not detected';
+      if (reason === 'LOW_CONFIDENCE') reasonText = 'Low confidence (<60%)';
+      if (reason === 'CONTROL_TIMEOUT') reasonText = 'Control timeout (>500ms)';
+      return {
+        label: 'SAFE FALLBACK',
+        class: 'safety-fallback',
+        hint: reasonText,
+      };
+    }
+    return {
+      label: 'ACTIVE',
+      class: 'safety-active',
+      hint: 'Valid tracking input',
+    };
+  };
+
+  const safetyBadge = getSafetyBadge(vehicle.safetyState, vehicle.safetyReason);
+
   return (
     <div className={`status-panel ${vehicle.isEmergencyStopped ? 'emergency-active-panel' : ''}`}>
       {/* Tracking Metrics */}
@@ -103,7 +130,7 @@ export const StatusPanel: React.FC<StatusPanelProps> = ({
         </div>
       </div>
 
-      {/* Vehicle Control Section */}
+      {/* Vehicle Control & Safety Section */}
       <div className="vehicle-section">
         <div className="status-header">
           <h3>Vehicle Control</h3>
@@ -111,6 +138,18 @@ export const StatusPanel: React.FC<StatusPanelProps> = ({
         </div>
 
         <div className={`vehicle-card ${vehicle.isEmergencyStopped ? 'emergency-alert-card' : ''}`}>
+          {/* Safety Layer Status */}
+          <div className="safety-status-row">
+            <span className="vehicle-label">Safety Status</span>
+            <div className="safety-pill-wrapper">
+              <span className={`safety-badge ${safetyBadge.class}`}>
+                <span className="safety-dot"></span>
+                {safetyBadge.label}
+              </span>
+              <span className="safety-hint">{safetyBadge.hint}</span>
+            </div>
+          </div>
+
           <div className="vehicle-main-row">
             <span className="vehicle-label">Vehicle Command</span>
             <span className={`command-badge ${getCommandBadgeClass(vehicle.command)}`}>
