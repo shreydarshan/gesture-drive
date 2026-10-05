@@ -2,6 +2,7 @@ import React from 'react';
 import { Header } from './components/Header';
 import { CameraFeed } from './components/CameraFeed';
 import { StatusPanel } from './components/StatusPanel';
+import { VehicleScene } from './components/VehicleScene';
 import { useHandTracking } from './hooks/useHandTracking';
 
 const App: React.FC = () => {
@@ -13,7 +14,7 @@ const App: React.FC = () => {
       <Header />
 
       <main className="main-content">
-        <div className="workspace-grid">
+        <div className="viewports-row">
           <CameraFeed
             videoRef={videoRef}
             canvasRef={canvasRef}
@@ -21,12 +22,16 @@ const App: React.FC = () => {
             onStart={startCamera}
             onStop={stopCamera}
           />
+          <VehicleScene />
+        </div>
+
+        <div className="dashboard-row">
           <StatusPanel stats={stats} onResetEmergency={resetEmergency} />
         </div>
       </main>
 
       <footer className="app-footer">
-        <p>GestureDrive Phase 6 — Safety & Reliability Fallback Layer</p>
+        <p>GestureDrive Phase 7.1 — 3D Rendering Foundation (Three.js / React Three Fiber)</p>
       </footer>
     </div>
   );
