@@ -31,7 +31,7 @@ const App: React.FC = () => {
       </main>
 
       <footer className="app-footer">
-        <p>GestureDrive Phase 7.2 — Real-time 3D Vehicle Control Integration (React Three Fiber)</p>
+        <p>GestureDrive Phase 7.3 — 3D Simulator Experience & Telemetry HUD (React Three Fiber)</p>
       </footer>
     </div>
   );

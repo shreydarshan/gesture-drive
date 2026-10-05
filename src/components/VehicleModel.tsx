@@ -99,6 +99,12 @@ export const VehicleModel: React.FC<VehicleModelProps> = ({ vehicleState }) => {
         />
       </mesh>
 
+      {/* Front Grille Intake */}
+      <mesh position={[0, -0.05, 2.11]}>
+        <boxGeometry args={[1.4, 0.22, 0.04]} />
+        <meshStandardMaterial color="#020617" roughness={0.9} />
+      </mesh>
+
       {/* Cabin Roof / Windshield */}
       <mesh position={[0, 0.45, -0.2]} castShadow>
         <boxGeometry args={[1.6, 0.45, 2.0]} />
@@ -108,6 +114,32 @@ export const VehicleModel: React.FC<VehicleModelProps> = ({ vehicleState }) => {
           metalness={0.9}
         />
       </mesh>
+
+      {/* Side Mirrors */}
+      <mesh position={[-0.95, 0.4, 0.6]}>
+        <boxGeometry args={[0.2, 0.1, 0.15]} />
+        <meshStandardMaterial color="#06b6d4" roughness={0.3} metalness={0.7} />
+      </mesh>
+      <mesh position={[0.95, 0.4, 0.6]}>
+        <boxGeometry args={[0.2, 0.1, 0.15]} />
+        <meshStandardMaterial color="#06b6d4" roughness={0.3} metalness={0.7} />
+      </mesh>
+
+      {/* Rear Spoiler Wing */}
+      <group position={[0, 0.55, -2.0]}>
+        <mesh position={[0, 0.15, 0]}>
+          <boxGeometry args={[1.9, 0.06, 0.35]} />
+          <meshStandardMaterial color={isEmergency ? '#ef4444' : '#06b6d4'} roughness={0.3} />
+        </mesh>
+        <mesh position={[-0.7, 0.05, 0]}>
+          <boxGeometry args={[0.06, 0.2, 0.2]} />
+          <meshStandardMaterial color="#0f172a" />
+        </mesh>
+        <mesh position={[0.7, 0.05, 0]}>
+          <boxGeometry args={[0.06, 0.2, 0.2]} />
+          <meshStandardMaterial color="#0f172a" />
+        </mesh>
+      </group>
 
       {/* Front Headlights */}
       <mesh position={[-0.7, 0.05, 2.11]}>
@@ -185,10 +217,25 @@ const Wheel: React.FC<{ tireRef: React.RefObject<THREE.Mesh | null> }> = ({ tire
       <cylinderGeometry args={[0.4, 0.4, 0.28, 24]} />
       <meshStandardMaterial color="#090d16" roughness={0.8} />
     </mesh>
-    {/* Inner Rim */}
+
+    {/* Metallic Rim Disk */}
     <mesh>
-      <cylinderGeometry args={[0.22, 0.22, 0.3, 16]} />
+      <cylinderGeometry args={[0.24, 0.24, 0.29, 16]} />
       <meshStandardMaterial color="#38bdf8" metalness={0.9} roughness={0.2} />
     </mesh>
+
+    {/* Brake Caliper */}
+    <mesh position={[0.15, 0, 0]}>
+      <boxGeometry args={[0.12, 0.14, 0.22]} />
+      <meshStandardMaterial color="#ef4444" roughness={0.3} />
+    </mesh>
+
+    {/* Metallic Spokes */}
+    {[0, 60, 120].map((rot) => (
+      <mesh key={rot} rotation={[0, (rot * Math.PI) / 180, 0]}>
+        <boxGeometry args={[0.04, 0.42, 0.3]} />
+        <meshStandardMaterial color="#e2e8f0" metalness={0.9} />
+      </mesh>
+    ))}
   </group>
 );

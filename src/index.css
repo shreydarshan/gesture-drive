@@ -160,35 +160,287 @@ body {
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
 }
 
-.scene-badge {
+/* Telemetry HUD In-Scene Overlay */
+.telemetry-hud-overlay {
   position: absolute;
-  top: 12px;
-  left: 12px;
+  inset: 0;
+  pointer-events: none;
   display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 12px;
+  z-index: 10;
+}
+
+.hud-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hud-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-sim-title {
+  display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 4px 10px;
   border-radius: 9999px;
-  background: rgba(15, 23, 42, 0.85);
+  background: rgba(15, 23, 42, 0.75);
   border: 1px solid var(--border-color);
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--text-main);
   backdrop-filter: blur(8px);
-  z-index: 10;
-  pointer-events: none;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--text-main);
 }
 
-.badge-dot {
+.hud-pulse-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: var(--accent-cyan);
+  box-shadow: 0 0 6px var(--accent-cyan);
+  animation: pulse 1.5s infinite;
 }
 
-.badge-dot.emergency-dot {
+.hud-safety-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  letter-spacing: 0.5px;
+  backdrop-filter: blur(8px);
+}
+
+.hud-safety-active {
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--accent-green);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.hud-safety-fallback {
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--accent-amber);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.hud-safety-emergency {
+  background: rgba(239, 68, 68, 0.25);
+  color: var(--accent-red);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+}
+
+.hud-command-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid var(--border-color);
+  padding: 4px 10px;
+  border-radius: 9999px;
+  backdrop-filter: blur(8px);
+}
+
+.hud-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.hud-command-pill {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-family: var(--font-mono, monospace);
+}
+
+.hud-cmd-accelerate {
+  background: rgba(16, 185, 129, 0.25);
+  color: var(--accent-green);
+}
+
+.hud-cmd-brake {
+  background: rgba(245, 158, 11, 0.25);
+  color: var(--accent-amber);
+}
+
+.hud-cmd-emergency {
+  background: rgba(239, 68, 68, 0.3);
+  color: var(--accent-red);
+  animation: pulse 1s infinite;
+}
+
+.hud-cmd-select {
+  background: rgba(168, 85, 247, 0.25);
+  color: var(--accent-purple);
+}
+
+.hud-cmd-idle {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+}
+
+/* Safety Alert Banner */
+.hud-alert-banner {
+  align-self: center;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  animation: fadeIn 0.3s ease;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.hud-alert-banner.banner-fallback {
+  background: rgba(245, 158, 11, 0.25);
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  color: var(--accent-amber);
+}
+
+.hud-alert-banner.banner-emergency {
+  background: rgba(239, 68, 68, 0.3);
+  border: 1px solid rgba(239, 68, 68, 0.6);
+  color: var(--accent-red);
+  animation: pulse 1s infinite;
+}
+
+.banner-icon {
+  font-size: 18px;
+}
+
+.banner-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.banner-title {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.banner-sub {
+  font-size: 10px;
+  opacity: 0.85;
+}
+
+/* Bottom HUD Telemetry Bar */
+.hud-bottom-bar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.hud-gauge-card {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 10px 14px;
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gauge-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hud-value-large {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-main);
+  font-family: var(--font-mono, monospace);
+}
+
+.hud-value-large small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.hud-value-medium {
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+}
+
+.hud-value-medium.steer-left {
+  color: var(--accent-cyan);
+}
+
+.hud-value-medium.steer-right {
+  color: var(--accent-purple);
+}
+
+.hud-value-medium.steer-center {
+  color: var(--text-muted);
+}
+
+/* Progress bar */
+.progress-bar-bg {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-cyan), #0284c7);
+  transition: width 0.1s linear;
+  border-radius: 9999px;
+}
+
+.progress-bar-fill.fill-high {
+  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+}
+
+.progress-bar-fill.fill-emergency {
   background: var(--accent-red);
-  box-shadow: 0 0 6px var(--accent-red);
+}
+
+/* Steering Gauge Arc Bar */
+.steering-gauge-bar {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+}
+
+.steering-center-marker {
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 10px;
+  background: var(--text-muted);
+}
+
+.steering-indicator-needle {
+  position: absolute;
+  top: -3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 8px var(--accent-cyan);
+  transform: translateX(-50%);
+  transition: left 0.1s ease-out;
 }
 
 /* Mirrored camera & overlay */
