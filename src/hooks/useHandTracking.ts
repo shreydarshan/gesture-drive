@@ -11,6 +11,8 @@ const INITIAL_VEHICLE_STATE = {
   command: 'IDLE' as const,
   speed: 0,
   steering: 0,
+  steeringAngle: 0,
+  steeringDirection: 'CENTER' as const,
   isEmergencyStopped: false,
 };
 
@@ -154,8 +156,11 @@ export function useHandTracking() {
           );
           const stabilizedGestures = debouncerRef.current.process(rawGestures);
 
-          // Vehicle control state engine
-          const vehicleState = vehicleControllerRef.current.update(stabilizedGestures);
+          // Vehicle control state engine (passing gestures + raw landmarks for directional steering)
+          const vehicleState = vehicleControllerRef.current.update(
+            stabilizedGestures,
+            results.landmarks
+          );
 
           updateStats({
             handDetected: hasHands,

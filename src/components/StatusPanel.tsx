@@ -47,6 +47,21 @@ export const StatusPanel: React.FC<StatusPanelProps> = ({
     }
   };
 
+  const getSteeringDisplay = () => {
+    const angle = vehicle.steeringAngle;
+    const dir = vehicle.steeringDirection;
+
+    if (dir === 'LEFT') {
+      return { text: `← LEFT (${Math.abs(angle)}°)`, class: 'steer-left' };
+    }
+    if (dir === 'RIGHT') {
+      return { text: `RIGHT (${angle}°) →`, class: 'steer-right' };
+    }
+    return { text: '0° (Center)', class: 'steer-center' };
+  };
+
+  const steeringDisplay = getSteeringDisplay();
+
   return (
     <div className={`status-panel ${vehicle.isEmergencyStopped ? 'emergency-active-panel' : ''}`}>
       {/* Tracking Metrics */}
@@ -111,8 +126,8 @@ export const StatusPanel: React.FC<StatusPanelProps> = ({
 
             <div className="vehicle-sub-metric">
               <span className="sub-label">Steering</span>
-              <span className="sub-value">
-                {vehicle.steering === 0 ? '0° (Center)' : `${vehicle.steering > 0 ? '+' : ''}${vehicle.steering}°`}
+              <span className={`sub-value ${steeringDisplay.class}`}>
+                {steeringDisplay.text}
               </span>
             </div>
 

@@ -25,9 +25,9 @@ export const Header: React.FC = () => {
         <div>
           <div className="title-row">
             <h1 className="app-title">GestureDrive</h1>
-            <span className="phase-tag">Phase 4</span>
+            <span className="phase-tag">Phase 5</span>
           </div>
-          <p className="app-subtitle">Vehicle Control Engine</p>
+          <p className="app-subtitle">Directional Steering Engine</p>
         </div>
       </div>
     </header>

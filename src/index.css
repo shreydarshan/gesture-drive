@@ -525,10 +525,22 @@ body {
 }
 
 .sub-value {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--text-main);
   font-family: var(--font-mono, monospace);
+}
+
+.sub-value.steer-left {
+  color: var(--accent-cyan);
+}
+
+.sub-value.steer-right {
+  color: var(--accent-purple);
+}
+
+.sub-value.steer-center {
+  color: var(--text-muted);
 }
 
 .sub-value small {
