@@ -1,4 +1,5 @@
 import type { HandGestureResult } from '../gesture/gestureTypes';
+import type { VehicleState } from '../vehicle/vehicleTypes';
 
 export type CameraStatus =
   | 'idle'
@@ -17,4 +18,5 @@ export interface HandTrackingStats {
   fps: number;
   isModelLoading: boolean;
   gestures: HandGestureResult[];
+  vehicleState: VehicleState;
 }

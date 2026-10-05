@@ -3,9 +3,13 @@ import type { HandTrackingStats } from '../types/handTracking';
 
 interface StatusPanelProps {
   stats: HandTrackingStats;
+  onResetEmergency: () => void;
 }
 
-export const StatusPanel: React.FC<StatusPanelProps> = ({ stats }) => {
+export const StatusPanel: React.FC<StatusPanelProps> = ({
+  stats,
+  onResetEmergency,
+}) => {
   const getStatusBadge = () => {
     switch (stats.status) {
       case 'active':
@@ -25,9 +29,26 @@ export const StatusPanel: React.FC<StatusPanelProps> = ({ stats }) => {
   };
 
   const statusBadge = getStatusBadge();
+  const vehicle = stats.vehicleState;
+
+  const getCommandBadgeClass = (cmd: string) => {
+    switch (cmd) {
+      case 'ACCELERATE':
+        return 'cmd-accelerate';
+      case 'BRAKE':
+        return 'cmd-brake';
+      case 'EMERGENCY_STOP':
+        return 'cmd-emergency';
+      case 'SELECT':
+        return 'cmd-select';
+      case 'IDLE':
+      default:
+        return 'cmd-idle';
+    }
+  };
 
   return (
-    <div className="status-panel">
+    <div className={`status-panel ${vehicle.isEmergencyStopped ? 'emergency-active-panel' : ''}`}>
       {/* Tracking Metrics */}
       <div className="status-header">
         <h3>Tracking Metrics</h3>
@@ -67,6 +88,57 @@ export const StatusPanel: React.FC<StatusPanelProps> = ({ stats }) => {
         </div>
       </div>
 
+      {/* Vehicle Control Section */}
+      <div className="vehicle-section">
+        <div className="status-header">
+          <h3>Vehicle Control</h3>
+          <span className="vehicle-sim-tag">Simulation</span>
+        </div>
+
+        <div className={`vehicle-card ${vehicle.isEmergencyStopped ? 'emergency-alert-card' : ''}`}>
+          <div className="vehicle-main-row">
+            <span className="vehicle-label">Vehicle Command</span>
+            <span className={`command-badge ${getCommandBadgeClass(vehicle.command)}`}>
+              {vehicle.command.replace('_', ' ')}
+            </span>
+          </div>
+
+          <div className="vehicle-metrics-grid">
+            <div className="vehicle-sub-metric">
+              <span className="sub-label">Speed</span>
+              <span className="sub-value">{vehicle.speed} <small>km/h</small></span>
+            </div>
+
+            <div className="vehicle-sub-metric">
+              <span className="sub-label">Steering</span>
+              <span className="sub-value">
+                {vehicle.steering === 0 ? '0° (Center)' : `${vehicle.steering > 0 ? '+' : ''}${vehicle.steering}°`}
+              </span>
+            </div>
+
+            <div className="vehicle-sub-metric full-width">
+              <span className="sub-label">Emergency Status</span>
+              <div className="emergency-status-wrapper">
+                <span className={`emergency-pill ${vehicle.isEmergencyStopped ? 'engaged' : 'normal'}`}>
+                  {vehicle.isEmergencyStopped ? 'ENGAGED' : 'NORMAL'}
+                </span>
+
+                {vehicle.isEmergencyStopped && (
+                  <button
+                    type="button"
+                    className="btn-reset-emergency"
+                    onClick={onResetEmergency}
+                    title="Reset simulated emergency stop state"
+                  >
+                    RESET EMERGENCY
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Gesture Recognition Engine Section */}
       <div className="gesture-section">
         <div className="status-header">
@@ -80,7 +152,7 @@ export const StatusPanel: React.FC<StatusPanelProps> = ({ stats }) => {
               <span className="gesture-label">Gesture</span>
               <span className="gesture-value gesture-none">NONE</span>
             </div>
-            <p className="gesture-hint">Show your hand to the camera to detect gestures.</p>
+            <p className="gesture-hint">Show your hand to the camera to drive.</p>
           </div>
         ) : (
           stats.gestures.map((res) => (

@@ -113,7 +113,7 @@ body {
 
 .workspace-grid {
   display: grid;
-  grid-template-columns: 1fr 360px;
+  grid-template-columns: 1fr 380px;
   gap: 24px;
 }
 
@@ -298,6 +298,12 @@ body {
   flex-direction: column;
   gap: 20px;
   height: fit-content;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.status-panel.emergency-active-panel {
+  border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
 }
 
 .status-header {
@@ -405,6 +411,169 @@ body {
 
 .fps-value {
   color: var(--accent-green);
+}
+
+/* Vehicle Control Section */
+.vehicle-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.vehicle-sim-tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--accent-green);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.vehicle-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: all 0.3s ease;
+}
+
+.vehicle-card.emergency-alert-card {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.vehicle-main-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vehicle-label {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.command-badge {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-family: var(--font-mono, monospace);
+  letter-spacing: 0.5px;
+}
+
+.cmd-accelerate {
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--accent-green);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.cmd-brake {
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--accent-amber);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.cmd-emergency {
+  background: rgba(239, 68, 68, 0.25);
+  color: var(--accent-red);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  animation: pulse 1s infinite;
+}
+
+.cmd-select {
+  background: rgba(168, 85, 247, 0.2);
+  color: var(--accent-purple);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+}
+
+.cmd-idle {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
+.vehicle-metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.vehicle-sub-metric {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.vehicle-sub-metric.full-width {
+  grid-column: span 2;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sub-label {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.sub-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-main);
+  font-family: var(--font-mono, monospace);
+}
+
+.sub-value small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.emergency-status-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.emergency-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.emergency-pill.normal {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--accent-green);
+}
+
+.emergency-pill.engaged {
+  background: rgba(239, 68, 68, 0.25);
+  color: var(--accent-red);
+}
+
+.btn-reset-emergency {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-reset-emergency:hover {
+  background: rgba(239, 68, 68, 0.4);
+  transform: translateY(-1px);
 }
 
 /* Gesture Recognition Engine Section */

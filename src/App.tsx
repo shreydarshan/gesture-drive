@@ -5,7 +5,8 @@ import { StatusPanel } from './components/StatusPanel';
 import { useHandTracking } from './hooks/useHandTracking';
 
 const App: React.FC = () => {
-  const { videoRef, canvasRef, stats, startCamera, stopCamera } = useHandTracking();
+  const { videoRef, canvasRef, stats, startCamera, stopCamera, resetEmergency } =
+    useHandTracking();
 
   return (
     <div className="app-container">
@@ -20,12 +21,12 @@ const App: React.FC = () => {
             onStart={startCamera}
             onStop={stopCamera}
           />
-          <StatusPanel stats={stats} />
+          <StatusPanel stats={stats} onResetEmergency={resetEmergency} />
         </div>
       </main>
 
       <footer className="app-footer">
-        <p>GestureDrive Phase 3 — Geometric Gesture Recognition Engine</p>
+        <p>GestureDrive Phase 4 — Vehicle Control Engine Abstraction</p>
       </footer>
     </div>
   );

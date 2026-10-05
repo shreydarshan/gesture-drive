@@ -5,6 +5,14 @@ import { disposeHandLandmarker, getHandLandmarker } from '../lib/mediapipe';
 import type { HandLandmarker } from '@mediapipe/tasks-vision';
 import { recognizeMultipleHandGestures } from '../gesture/gestureRecognizer';
 import { GestureDebouncer } from '../gesture/gestureDebouncer';
+import { VehicleController } from '../vehicle/vehicleController';
+
+const INITIAL_VEHICLE_STATE = {
+  command: 'IDLE' as const,
+  speed: 0,
+  steering: 0,
+  isEmergencyStopped: false,
+};
 
 export function useHandTracking() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -19,12 +27,14 @@ export function useHandTracking() {
     fps: 0,
     isModelLoading: false,
     gestures: [],
+    vehicleState: INITIAL_VEHICLE_STATE,
   });
 
   const streamRef = useRef<MediaStream | null>(null);
   const animFrameIdRef = useRef<number | null>(null);
   const landmarkerRef = useRef<HandLandmarker | null>(null);
   const debouncerRef = useRef<GestureDebouncer>(new GestureDebouncer(5));
+  const vehicleControllerRef = useRef<VehicleController>(new VehicleController());
   const lastVideoTimeRef = useRef<number>(-1);
   const frameCountRef = useRef<number>(0);
   const lastFpsTimeRef = useRef<number>(0);
@@ -36,6 +46,13 @@ export function useHandTracking() {
     if (!isMountedRef.current) return;
     setStats((prev) => ({ ...prev, ...partial }));
   }, []);
+
+  // Explicit Emergency Reset handler
+  const resetEmergency = useCallback(() => {
+    vehicleControllerRef.current.resetEmergency();
+    const updatedState = vehicleControllerRef.current.getState();
+    updateStats({ vehicleState: updatedState });
+  }, [updateStats]);
 
   // Stop Camera function
   const stopCamera = useCallback(() => {
@@ -61,7 +78,9 @@ export function useHandTracking() {
     }
 
     debouncerRef.current.reset();
+    vehicleControllerRef.current.reset();
     lastVideoTimeRef.current = -1;
+
     updateStats({
       status: 'idle',
       errorMessage: null,
@@ -70,6 +89,7 @@ export function useHandTracking() {
       confidence: null,
       fps: 0,
       gestures: [],
+      vehicleState: INITIAL_VEHICLE_STATE,
     });
   }, [updateStats]);
 
@@ -82,7 +102,6 @@ export function useHandTracking() {
     const landmarker = landmarkerRef.current;
 
     if (video && canvas && landmarker && video.readyState >= 2) {
-      // Synchronize canvas size with video resolution
       if (video.videoWidth && video.videoHeight) {
         if (
           canvas.width !== video.videoWidth ||
@@ -128,18 +147,22 @@ export function useHandTracking() {
             avgConfidence = Math.round((totalScore / results.handedness.length) * 100);
           }
 
-          // Recognize gestures for up to 2 detected hands
+          // Gesture recognition & temporal debouncing
           const rawGestures = recognizeMultipleHandGestures(
             results.landmarks,
             results.handedness
           );
           const stabilizedGestures = debouncerRef.current.process(rawGestures);
 
+          // Vehicle control state engine
+          const vehicleState = vehicleControllerRef.current.update(stabilizedGestures);
+
           updateStats({
             handDetected: hasHands,
             numHands: detectedHandsCount,
             confidence: avgConfidence,
             gestures: stabilizedGestures,
+            vehicleState,
           });
 
           // Draw landmarks on overlay canvas
@@ -160,7 +183,6 @@ export function useHandTracking() {
     }
   }, [updateStats]);
 
-  // Keep ref updated
   useEffect(() => {
     processFrameRef.current = processFrame;
   }, [processFrame]);
@@ -278,5 +300,6 @@ export function useHandTracking() {
     stats,
     startCamera,
     stopCamera,
+    resetEmergency,
   };
 }
